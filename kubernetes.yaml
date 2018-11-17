@@ -1,0 +1,40 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: microprofile 
+spec:
+  selector:
+    matchLabels:
+      app: microprofile
+  replicas: 1 # deployment runs 1 pods matching the template
+  template: # create pods using pod definition in this template
+    metadata:
+      labels:
+        app: microprofile
+    spec:
+      containers:
+      - name: microprofile
+        image: iad.ocir.io/rodrigocandidosilva/microprofile
+        imagePullPolicy: Always
+        ports:
+        - name: microprofile
+          containerPort: 8080 #Endpoint is at port 8081 in the container
+          protocol: TCP
+      imagePullSecrets:
+      - name: wercker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microprofile 
+  labels:
+    app: microprofile
+spec:
+  type: LoadBalancer #Exposes the service
+  ports:
+  - port: 30000
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: microprofile
+---
